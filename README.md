@@ -5,11 +5,14 @@
 
 <h3>Projeto: Construção de uma Garrafa de Café Baseado em Iot</h3>
 
-Através dos conseitos estudados no curso será desenvolvido uma garrafa de café com os seguintes dispositivos/sensores:
-- Air Pump
-- Sensor de Temperatura
-- Relê
-- Galileo Borad 
+O projeto serve como um controlador de uma garrafa de café inteligente baseado nos conceitos de IOT.
 
-## Funcionamento do Projeto
-Através de uma conexão via web será possivel acionar a garrafa de café,e verificar a temperatura do liquido.
+O controlador exibe a temperatura do líquido na tela LCD, a temperatura é captada por sensor submerso no líquido.
+A placa Galileo funciona ao mesmo tempo como slave e server. A temperatura é enviada para o servidor MQTT que retorna para a placa que, processa a informação, retorna os dados para o servidor MQTT que envia novamente para a placa publicando os dados ao usuário.
+
+O sistema libera o líquido por duas formas:
+<ul>
+  <li>Sensor de IR de proximidade</li>
+  <li>Solicitação via WEB</li>
+</ul>
+Quando solicitado mediante uma das formas acima o relê ativa a bomba air pump que bombeia o líquido.
