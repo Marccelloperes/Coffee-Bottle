@@ -1,12 +1,12 @@
 # Coffee-Bottle
 
 <h1> Trabalho de Conclusão de curso Iot_IFESP</h1>
-<h3>Prof. Dr. Gustavo Voltani von Atzingen </h3>
-<h2>Alunos:</h2>
-<h2>Eraldo Gonçalves Junior</h2>
-<h2>Marccello Peres</h2>
+<h2>Prof. Dr. Gustavo Voltani von Atzingen </h2>
+<h3>Alunos:</h3>
+<h3>Eraldo Gonçalves Junior</h3>
+<h3>Marccello Peres</h3>
 
-<h3>Projeto: Construção de uma Garrafa de Café Baseado em Iot</h3>
+<h2>Projeto: Construção de uma Garrafa de Café Baseado em Iot</h2>
 
 O projeto serve como um controlador de uma garrafa de café inteligente baseado nos conceitos de IOT.
 
