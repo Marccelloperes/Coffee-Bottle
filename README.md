@@ -2,6 +2,9 @@
 
 <h1> Trabalho de Conclusão de curso Iot_IFESP</h1>
 <h2>Prof. Dr. Gustavo Voltani von Atzingen </h2>
+<h2>Alunos</h2>
+<h3>Eraldo Gonçalves Junior</h3>
+<h3>Marcello Peres</h3>
 
 <h3>Projeto: Construção de uma Garrafa de Café Baseado em Iot</h3>
 
