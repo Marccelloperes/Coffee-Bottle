@@ -1,23 +1,85 @@
 <!DOCTYPE html>
 <html>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <head>
-        <title>Server Galileo</title>
-    </head>
-
-    <body>
+  <head>
+    <title>Coffee Bottle</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <header>
+      <!--INÍCIO DA NAVBAR-->
+        <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <div class="jumbotron text-center">
-                <h1> Flask no Galileo </h1>
-                <h2> Valor dos sensores </h2>
-            </div>
-
-        {% block content %}
-        {% endblock %}
-
+          <div class="navbar-header">
+            <a href="/" class="navbar-brand"><img src="{{ url_for('static', filename='img/coffee-mini.png')}}" height="50px" alt="Logo Coffee Bottle"></a>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="collapse navbar-collapse navbar-right" id="navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="/">Início</a></li>
+              <li><a href="/sobre">Sobre</a></li>
+              <li><a href="#" data-toggle="modal" data-target="#modalLogin">Entrar</a></li>
+            </ul>
+          </div>
         </div>
-    </body>
-
+      </nav>
+      <!--FIM DA NAVBAR-->
+      <!-- INÍCIO DO MODAL DE LOGIN -->
+      <div class="modal fade" id="modalLogin" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                  <img src="{{url_for('static', filename='img/coffee-bottle.png')}}" class="img-responsive" alt="Logo Coffee Bottle" height="100px">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <h4 class="modal-title text-center">Seja bem vindo!</h4>
+                </div>
+              </div>
+            </div>
+            <div class="modal-body">
+              <form class="form-horizontal" name="formLogin" id="formLogin" action="/login" method="POST">
+                <div class="form-group">
+                  <div class="row col-md-8 col-md-offset-2">
+                    <input type="email" class="form-control" id="email" name="email" value="" placeholder="Email" required="true" title="Digite seu email">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="row col-md-8 col-md-offset-2">
+                    <input type="password" class="form-control" id="pass" name="pass" placeholder="Senha" required="true" title="Digite sua senha">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 text-center">
+                    <a href="/registro">Ainda não é cadastrado?</a>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="formLogin" class="btn btn-info">Entrar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- FIM DO MODAL DE LOGIN -->
+    </header>
+    <div class="container-fluid">
+      {% block content %}
+      {% endblock %}
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+  </body>
 </html>

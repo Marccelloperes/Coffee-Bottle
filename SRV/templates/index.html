@@ -1,21 +1,24 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Coffee Bottle</title>
-        <link rel="stylesheet" href="css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container-fluid">
-            <div class="jumbotron text-center">
-                <img src="img/coffee-bottle.png" alt="Logo Coffee Bottle" class="img-responsive">
-            </div>
-            <ul class="list-group">
-                <li class="list-group-item">Item 1</li>
-                <li class="list-group-item">Item 2</li>
-                <li class="list-group-item">Item 3</li>
-            </ul>
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid">
+      {% if msg!='' and type=='success' %}
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="alert alert-success text-center" role="alert">{{msg}}</div>
         </div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-      </body>
-</html>
+      </div>
+      {% endif %}
+      {% if msg!='' and type=='danger' %}
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="alert alert-danger text-center" role="alert">{{msg}}</div>
+        </div>
+      </div>
+      {% endif %}
+      <div class="row">
+        <div class="col-md-12">
+            <img src="{{ url_for('static',filename='img/coffee-bottle.png') }}" width="800px" alt="Logo Coffee Bottle" class="img-responsive center-block">
+        </div>
+      </div>
+    </div>
+{% endblock %}
