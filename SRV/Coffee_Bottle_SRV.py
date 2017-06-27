@@ -1,7 +1,9 @@
-# -*- coding: latin-1 -*-
-from flask import Flask, render_template, request, session
+# -*- coding: utf-8 -*-
+from flask import Flask, render_template, request, session, url_for
+from functools import wraps
+from Adafruit_IO import Client, Feed
 import sqlite3
-import scipy
+import db
 
 #----------------------------------
 # VARIÁVIES GLOBAIS
@@ -9,93 +11,128 @@ import scipy
 app = Flask(__name__)
 tbl_usuarios = 'usuarios'
 app.config['SECRET_KEY'] = "A0Zr98j/3yX R~XHH!jmN]/*-+hsHASHsh6 #$$"
+ADAFRUIT_IO_KEY = 'dfee8fe53e5545398320b5119bd83de3'
+ADAFRUIT_IO_USERNAME = 'eraldojr'
+adafruit = Client(ADAFRUIT_IO_KEY)
 
 #----------------------------------
 # ROTAS
 #----------------------------------
+def loginNecessario(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session is None:
+            return render_template("erros/nao-logado.html"), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route("/")
 def hello():
-    return render_template("index.html")
+    return render_template("index.html"), 200
+
+@app.route("/login", methods=['POST', 'GET'])
+def efetuaLogin():
+    if(session):
+        return render_template("minha-pagina.html"), 200
+    elif(request.method == 'GET'):
+        return render_template("login.html"), 200
+    elif(request.method == 'POST'):
+        _email = request.form.get('email')
+        _senha = request.form.get('pass')
+        usuario = db.valida_login(_email, _senha)
+        if(usuario.all() == False):
+            return render_template("index.html", msg='Email ou senha inválidos!', type='danger'), 401
+        else:
+            session.permanent = True
+            session['usr_id'] = usuario[0]
+            session['usr_email'] = usuario[1]
+            session['usr_nome'] = usuario[2]
+            session['usr_tag'] = usuario[4]
+            session['usr_nivel'] = usuario[5]
+            session['usr_ativo'] = usuario[6]
+            return render_template("minha-pagina.html"), 200
+
+@app.route("/logout")
+def logout():
+
+    session.pop('_permanent', None)
+    session.pop('usr_id', None)
+    session.pop('usr_nome', None)
+    session.pop('usr_email', None)
+    session.pop('usr_tag', None)
+    session.pop('usr_nivel', None)
+    session.pop('usr_ativo', None)
+    return render_template("index.html"), 200
+
+
+@app.route("/minha-pagina", methods=['POST', 'GET'])
+def minhaPagina():
+    if session:
+        return render_template("minha-pagina.html"), 200
+    else:
+        return render_template("erros/nao-logado.html"), 401
+
+@app.route("/pedir-cafe")
+def pedirCafe():
+    if(session):
+        liberaCafe()
+        return render_template("minha-pagina.html", msg="Solicitado. Seu café estará liberado por 30 segundos.", type='success'), 201
+    else:
+        return render_template("erros/nao-logado.html"), 401
+
+@app.route("/sobre")
+def sobre():
+    return render_template("sobre.html"), 200
 
 @app.route("/registro", methods=['POST', 'GET'])
 def registro():
     if(request.method == 'GET'):
-        return render_template("registro.html")
+        return render_template("registro.html"), 200
     elif(request.method == 'POST'):
         _nome = request.form.get('nome')
         _email = request.form.get('email')
         _senha = request.form.get('pass')
-        if(novo_usuario(_nome, _email, _senha)):
-            return render_template("index.html", msg="Conta criada com sucesso!", type='success')
+        if(db.novo_usuario(_nome, _email, _senha)):
+            return render_template("index.html", msg="Conta criada com sucesso!", type='success'), 201
         else:
-            return render_template("index.html", msg="Erro ao criar conta!", type='danger')
+            return render_template("index.html", msg="Erro ao criar conta!", type='danger'), 500
 
-@app.route("/login", methods=['POST', 'GET'])
-def efetuaLogin():
-    if(request.method == 'GET'):
-        return render_template("login.html")
-    elif(request.method == 'POST'):
-        _email = request.form.get('email')
-        _senha = request.form.get('pass')
-        if(valida_login(_email, _senha)):
-            return render_template("minha-pagina.html")
-        else:
-            return render_template("index.html", msg='Email ou senha inválidos!', type='danger')
+@app.route("/gerenciar-usuarios")
+def gerenciarUsuarios():
+    if(session and session['usr_nivel'] == 1):
+        result = db.busca_usuarios()
+        return render_template("gerenciar-usuarios.html", usuarios=result), 200
+    else:
+        return render_template("erros/nao-autorizado.html", usuarios=result), 401
 
-@app.route("/logout")
-def logout():
-    session.pop('usr_id', None)
-    session.pop('usr_nome', None)
-    session.pop('usr_email', None)
-    return render_template("index.html")
+@app.route("/historico")
+def historico():
+    return render_template("historico.html"), 200
 
-@app.route("/sobre")
-def sobre():
-    return render_template("sobre.html")
+@app.route("/ativar-usuario/<id>")
+def ativarUsuario(id):
+    if(db.ativar_usuario(id)):
+        result = db.busca_usuarios()
+        return render_template("gerenciar-usuarios.html",usuarios=result, msg="Alteração feita com sucesso!", type='success'), 200
+    else:
+        result = db.busca_usuarios()
+        return render_template("gerenciar-usuarios.html", msg="Não foi possível alterar!", type='danger'), 400
 
-#----------------------------------
-# MÉTODOS DO BANCO
-#----------------------------------
-
-# Método para efetuar login
-def valida_login(_email, _senha):
-    try:
-        connect = sqlite3.connect('database.db')
-        cursor = connect.cursor()
-        cursor.execute(''' SELECT * FROM usuarios WHERE email = ? AND senha = ?''', (_email, _senha))
-        connect.commit()
-        result = scipy.array(cursor.fetchall())
-        for usuario in result:
-            if(usuario[2] == ''):
-                return False;
-            session['usr_id'] = usuario[0]
-            session['usr_email'] = usuario[1]
-            session['usr_nome'] = usuario[2]
-            return True
-        else:
-            return False
-    except Exception as e:
-        print ('valida_login(): ', e)
-        return False
-    print (_email)
-    return False
-
-# Método para criar um usuário
-def novo_usuario(_nome, _email, _senha):
-    try:
-        connect = sqlite3.connect('database.db')
-        cursor = connect.cursor()
-        cursor.execute('''INSERT INTO usuarios (nome, email, senha) VALUES (?,?,?)''', (_nome, _email, _senha))
-        connect.commit()
-        connect.close()
-        return True
-    except Exception as e:
-        print ('novo_usuario(): ', e)
-        return False
+@app.route("/excluir-usuario/<id>")
+def excluirUsuario(id):
+    if(db.excluir_usuario(id)):
+        result = db.busca_usuarios()
+        return render_template("gerenciar-usuarios.html", usuarios=result, msg="Usuário excluído com sucesso!", type='success'), 200
+    else:
+        result = db.busca_usuarios()
+        return render_template("gerenciar-usuarios.html", usuarios=result, msg="Não foi possível excluir", type='danger'), 400
 
 #----------------------------------
-# MÉTODOS
+# MÉTODOS DO SERVER
 #----------------------------------
+def liberaCafe():
+    adafruit.send('teste', 1)
+
 
 
 if __name__ == "__main__":

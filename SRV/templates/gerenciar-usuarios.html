@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if msg!='' and type=='success' %}
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="alert alert-success text-center" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          {{msg}}</div>
+    </div>
+  </div>
+  {% endif %}
+  {% if msg!='' and type=='danger' %}
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="alert alert-danger text-center" role="alert">{{msg}}</div>
+    </div>
+  </div>
+  {% endif %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2 text-center">
+            <h1>GERENCIAR USUÁRIOS</h1>
+        </div>
+      </div>
+      <hr>
+      <div class="col-md-8 col-md-offset-2 text-center">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <td>ID</td>
+              <td>Nome</td>
+              <td>Email</td>
+              <td>Tag</td>
+              <td>Ações</td>
+            </tr>
+          </thead>
+          <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+              <td>{{ usuario[0] }}</td>
+              <td>{{ usuario[2] }}</td>
+              <td>{{ usuario[1] }}</td>
+              <td>{{ usuario[4] }}</td>
+              <td>
+
+                {% if usuario[6] == 1 %}
+                <a href="/ativar-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Desativar"><i class="fa fa-toggle-on fa-lg"></i></a>
+                {% else %}
+                <a href="/ativar-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Ativar"><i class="fa fa-toggle-off fa-lg"></i></a>
+                {% endif %}
+                |
+                <a href="/excluir-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Excluir"><i class="fa fa-trash fa-lg"></i></a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}
