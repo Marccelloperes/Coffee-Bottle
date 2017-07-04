@@ -48,10 +48,10 @@
               <td>{{ usuario[4] }}</td>
               <td>
 
-                {% if usuario[6] == 1 %}
-                <a href="/ativar-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Desativar"><i class="fa fa-toggle-on fa-lg"></i></a>
+                {% if usuario[6] == '1' %}
+                <a href="/ativar-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Ativar"><i class="fa fa-toggle-on fa-lg"></i></a>
                 {% else %}
-                <a href="/ativar-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Ativar"><i class="fa fa-toggle-off fa-lg"></i></a>
+                <a href="/ativar-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Desativar"><i class="fa fa-toggle-off fa-lg"></i></a>
                 {% endif %}
                 |
                 <a href="/excluir-usuario/{{usuario[0]}}" data-toggle="tooltip" title="Excluir"><i class="fa fa-trash fa-lg"></i></a>

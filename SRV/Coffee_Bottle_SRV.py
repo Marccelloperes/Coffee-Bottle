@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, session, url_for
+from flask import Flask, render_template, request, session, url_for, jsonify
 from functools import wraps
 from Adafruit_IO import Client, Feed
 import sqlite3
@@ -13,19 +13,12 @@ tbl_usuarios = 'usuarios'
 app.config['SECRET_KEY'] = "A0Zr98j/3yX R~XHH!jmN]/*-+hsHASHsh6 #$$"
 ADAFRUIT_IO_KEY = 'dfee8fe53e5545398320b5119bd83de3'
 ADAFRUIT_IO_USERNAME = 'eraldojr'
+ocupada = False
 adafruit = Client(ADAFRUIT_IO_KEY)
 
 #----------------------------------
 # ROTAS
 #----------------------------------
-def loginNecessario(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session is None:
-            return render_template("erros/nao-logado.html"), 401
-        return f(*args, **kwargs)
-    return decorated_function
-
 @app.route("/")
 def hello():
     return render_template("index.html"), 200
@@ -40,9 +33,8 @@ def efetuaLogin():
         _email = request.form.get('email')
         _senha = request.form.get('pass')
         usuario = db.valida_login(_email, _senha)
-        if(usuario.all() == False):
-            return render_template("index.html", msg='Email ou senha inválidos!', type='danger'), 401
-        else:
+        if usuario.size:
+            print (usuario)
             session.permanent = True
             session['usr_id'] = usuario[0]
             session['usr_email'] = usuario[1]
@@ -51,6 +43,8 @@ def efetuaLogin():
             session['usr_nivel'] = usuario[5]
             session['usr_ativo'] = usuario[6]
             return render_template("minha-pagina.html"), 200
+        else:
+            return render_template("index.html", msg='Email ou senha inválidos!', type='danger'), 401
 
 @app.route("/logout")
 def logout():
@@ -75,8 +69,10 @@ def minhaPagina():
 @app.route("/pedir-cafe")
 def pedirCafe():
     if(session):
-        liberaCafe()
-        return render_template("minha-pagina.html", msg="Solicitado. Seu café estará liberado por 30 segundos.", type='success'), 201
+        if(db.busca_tag(session['usr_tag'])):
+            return render_template("minha-pagina.html", msg="Solicitado. Seu café estará liberado por 30 segundos.", type='success'), 201
+        else:
+            return render_template("minha-pagina.html", msg="Erro! Você está autorizado?.", type='danger'), 401
     else:
         return render_template("erros/nao-logado.html"), 401
 
@@ -99,10 +95,11 @@ def registro():
 
 @app.route("/gerenciar-usuarios")
 def gerenciarUsuarios():
-    if(session and session['usr_nivel'] == 1):
+    if(session and session['usr_nivel'] == '1'):
         result = db.busca_usuarios()
         return render_template("gerenciar-usuarios.html", usuarios=result), 200
     else:
+        result = db.busca_usuarios()
         return render_template("erros/nao-autorizado.html", usuarios=result), 401
 
 @app.route("/historico")
@@ -127,13 +124,34 @@ def excluirUsuario(id):
         result = db.busca_usuarios()
         return render_template("gerenciar-usuarios.html", usuarios=result, msg="Não foi possível excluir", type='danger'), 400
 
+@app.route("/api-consulta-tag/<tag>")
+def consultaTag(tag):
+    if(db.busca_tag(tag)):
+        return jsonify(True)
+    else:
+        return jsonify(False)
+
+@app.route("/api-consulta-solicitacoes")
+def consultaSolicitacoes():
+    result = db.busca_solicitacoes()
+    try:
+        solicitacao = result[0]
+        db.efetiva_solicitacao(solicitacao)
+        return jsonify(True)
+    except:
+        return jsonify(False)
+
+
+@app.route("/api-atualiza-temperatura/<temperatura>")
+def atualizaTemperatura(temperatura):
+    db.atualiza_temperatura(temperatura)
+    return jsonify(True)
+
+
+
 #----------------------------------
 # MÉTODOS DO SERVER
 #----------------------------------
-def liberaCafe():
-    adafruit.send('teste', 1)
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
