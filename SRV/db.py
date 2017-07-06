@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import session
-import datetime
-import sqlite3
-import scipy
-import db
+import datetime, sqlite3, scipy, db
 
 # Método para efetuar login
 def valida_login(_email, _senha):
@@ -99,7 +96,7 @@ def busca_tag(tag):
             ativo = result[0][1]
             if ativo == 1:
                 try:
-                    data_hora = datetime.datetime.now().strftime("%Y%m%d-%H:%M")
+                    data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     connect = sqlite3.connect('database.db')
                     cursor = connect.cursor()
                     cursor.execute('''INSERT INTO historico (id_usuario, data_hora, status) VALUES (?,?, 0)''', (int(_id), data_hora,))
@@ -149,11 +146,33 @@ def atualiza_temperatura(temp):
     try:
         connect = sqlite3.connect('database.db')
         cursor = connect.cursor()
-        data_hora = datetime.datetime.now().strftime("%Y%m%d-%H:%M")
+        data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute('''INSERT INTO temperatura (valor, data_hora) VALUES (?,?) ''', (temp, data_hora,))
         connect.commit()
         connect.close()
         return True
     except Exception as e:
         print ('atualiza_temperatura(): ', e)
+        return False
+
+def busca_temperaturas():
+    try:
+        connect = sqlite3.connect('database.db')
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM temperatura ORDER BY datetime(data_hora) DESC")
+        connect.commit()
+        return scipy.array(cursor.fetchall())
+    except Exception as e:
+        print ('busca_temperaturas(): ', e)
+        return False
+
+def busca_historico():
+    try:
+        connect = sqlite3.connect('database.db')
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM historico WHERE status = 1 ORDER BY datetime(data_hora) DESC")
+        connect.commit()
+        return scipy.array(cursor.fetchall())
+    except Exception as e:
+        print ('busca_solicitacoes(): ', e)
         return False

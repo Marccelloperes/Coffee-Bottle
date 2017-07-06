@@ -24,17 +24,17 @@
     <div class="container-fluid">
       <div class="row text-center">
         <div class="col-md-4 col-md-offset-4">
-          <h1 class="text-center">Histórico de Pedidos</h1>
+          <h1 class="text-center">Temperaturas</h1>
           <table class="table table-hover table-condensed">
             <thead>
               <tr>
                 <td><h3>#</h3></td>
-                <td><h3>ID Usuário</h3></td>
+                <td><h3>ºC</h3></td>
                 <td><h3>Data/Hora</h3></td>
               </tr>
             </thead>
             <tbody>
-              {% for dado in pedidos %}
+              {% for dado in temp %}
             <tr>
               <td>{{ dado[0] }}</td>
               <td>{{ dado[1] }}</td>

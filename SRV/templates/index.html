@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3 panel">
+          <h3>Temperatura Atual: <b>{{ temperatura }} ºC</b></h3>
+          <p>Atualizado em: <b>{{ datahora }}</b></p>
+        </div>
+      </div>
       {% if msg!='' and type=='success' %}
       <div class="row">
         <div class="col-md-6 col-md-offset-3">

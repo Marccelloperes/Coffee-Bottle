@@ -17,10 +17,13 @@ def conectaWLAN():
     print("Configurações da rede:", wlan.ifconfig())
 conectaWLAN()
 
-import os
-os.remove('main.py')
-m = open('main.py','w')
-m.write('''def conectaWLAN():\n    import os\n    import sys\n    import network\n    wlan = network.WLAN(network.STA_IF)\n    wlan.active(True)\n    if not wlan.isconnected():\n        print("Conectando a rede...")\n        wlan.connect('OUTBACK', 'rosalinda')\n        while not wlan.isconnected():\n            pass\n    print("Configurações da rede:", wlan.ifconfig())\nconectaWLAN()''')
 
+#Executar esses códigos para gravar o main.py
+import os
+m = open('main.py','w')
+m.write('''def conectaWLAN():\n    import os\n    import sys\n    import network\n    wlan = network.WLAN(network.STA_IF)\n    wlan.active(True)\n    if not wlan.isconnected():\n        print("Conectando a rede...")\n        wlan.connect('QUERO CAFE', 'cafe2017')\n        while not wlan.isconnected():\n            pass\n    print("Configurações da rede:", wlan.ifconfig())\nconectaWLAN()''')
+
+#Após conectar à WLAN configrar o WebREPL
 import webrepl_setup
+
 webrepl.start()
